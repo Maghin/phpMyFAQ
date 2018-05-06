@@ -1,6 +1,16 @@
 version: "2.2"
 
 services:
+  mariadb:
+    image: mariadb:10.2.14
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=iop
+      - MYSQL_DATABASE=phpmyfaq
+      - MYSQL_USER=phpmyfaq
+      - MYSQL_PASSWORD=phpmyfaq
+    volumes:
+      - ./volumes/mariadb:/var/lib/mysql
   phpmyfaq:
     build:
       context: .
@@ -42,16 +52,6 @@ services:
       - "8000:80"
     volumes:
       - ./volumes/sessions:/sessions
-  mariadb:
-    image: mariadb:10.2.11
-    restart: always
-    environment:
-      - MYSQL_ROOT_PASSWORD=iop
-      - MYSQL_DATABASE=phpmyfaq
-      - MYSQL_USER=phpmyfaq
-      - MYSQL_PASSWORD=phpmyfaq
-    volumes:
-      - ./volumes/mariadb:/var/lib/mysql
   elasticsearch:
     image: elasticsearch:2.4.6
     restart: always
