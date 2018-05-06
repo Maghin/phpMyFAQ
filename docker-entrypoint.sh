@@ -58,12 +58,12 @@ if [ -f "$APACHE_ENVVARS" ]; then
       sed -ri .htaccess \
         -e "s~RewriteBase /phpmyfaq/~RewriteBase /~"
       # Enabling permissions override
-      sed -ri "${APACHE_CONFDIR}/conf-available/*.conf" \
+      sed -ri ${APACHE_CONFDIR}/conf-available/*.conf \
         -e "s~(.*AllowOverride).*~\1 All~g"
   else
       rm .htaccess
       # Disabling permissions override
-      sed -ri "${APACHE_CONFDIR}/conf-available/*.conf" \
+      sed -ri ${APACHE_CONFDIR}/conf-available/*.conf \
         -e "s~(.*AllowOverride).*~\1 none~g"
   fi
 fi
