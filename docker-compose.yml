@@ -4,7 +4,7 @@ services:
   phpmyfaq:
     build:
       context: .
-      dockerfile: Dockerfile-dev # Change to "Dockerfile" to to work with the production image
+      dockerfile: Dockerfile
     restart: always
     stdin_open: true
     links:
