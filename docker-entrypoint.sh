@@ -7,10 +7,12 @@ set -e
 folders="attachments data images config"
 
 mkdir -vp $folders
-chmod 775 $folders
 
-. "$APACHE_ENVVARS"
-chown -R "$APACHE_RUN_USER:$APACHE_RUN_GROUP" .
+{
+  . "$APACHE_ENVVARS"
+  chmod 775 $folders
+  chown -R "$APACHE_RUN_USER:$APACHE_RUN_GROUP" $folders
+}
 
 #=== Enable htaccess for search engine optimisations ===
 if [ "x${DISABLE_HTACCESS}" = "x" ]; then
