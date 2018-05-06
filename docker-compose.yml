@@ -2,7 +2,10 @@ version: "2.2"
 
 services:
   phpmyfaq:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile-dev # Change to "Dockerfile" to to work with the production image
+    restart: always
     stdin_open: true
     links:
       - mariadb:db
@@ -10,42 +13,28 @@ services:
     ports:
       - "8080:80"
     volumes:
-    depends_on:
-      - grunt
-  grunt:
-    image: digitallyseamless/nodejs-bower-grunt
-    restart: "no"
-    command: grunt build
-    stdin_open: true
-    tty: true
-    volumes:
-      - .:/data
-    depends_on:
-      - yarn
-  yarn:
-    image: node:8-alpine
-    restart: "no"
-    command: sh -c "cd app && npm install node-sass -g && yarn install && yarn build"
-    stdin_open: true
-    tty: true
-    volumes:
-      - .:/app
-    depends_on:
-      - composer
-  composer:
-    image: composer:1.6.1
-    restart: "no"
-    command: composer install --verbose --no-dev
-    stdin_open: true
-    tty: true
-    volumes:
-      - .:/app
       - ./volumes/phpmyfaq/attachments:/var/www/html/attachments
-      - ./volumes/phpmyfaq/config:/var/www/html/config
       - ./volumes/phpmyfaq/data:/var/www/html/data
       - ./volumes/phpmyfaq/images:/var/www/html/images
+      - ./phpmyfaq/config:/var/www/html/config
+    environment:
+      - PMF_SITE_NAME=phpMyFAQ
+      - PMF_SITE_LANG=en
+      - PMF_ENABLE_UPLOADS=On
+      - PMF_ADMIN_USER=admin
+      - PMF_ADMIN_PASS=changeit
+      - PMF_DB_HOST=db
+      - PMF_DB_NAME=phpmyfaq
+      - PMF_DB_USER=phpmyfaq
+      - PMF_DB_PASS=phpmyfaq
+      - PMF_DISABLE_HTACCESS=""
+      - PMF_TIMEZONE="Europe/Berlin"
+      - PMF_MEMORY_LIMIT=64M
+      - PHP_LOG_ERRORS=On
+      - PHP_ERROR_REPORTING=E_ALL # Production Value: E_ALL & ~E_DEPRECATED & ~E_STRICT
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    restart: always
     stdin_open: true
     links:
       - mariadb:db
@@ -55,6 +44,7 @@ services:
       - ./volumes/sessions:/sessions
   mariadb:
     image: mariadb:10.2.11
+    restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=iop
       - MYSQL_DATABASE=phpmyfaq
@@ -64,6 +54,7 @@ services:
       - ./volumes/mariadb:/var/lib/mysql
   elasticsearch:
     image: elasticsearch:2.4.6
+    restart: always
     environment:
       - cluster.name=phpmyfaq-cluster
       - bootstrap.memory_lock=true
