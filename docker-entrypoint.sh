@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 
 # Exit on error
 set -e
@@ -9,9 +9,13 @@ folders="attachments data images config"
 mkdir -vp $folders
 
 {
-  . "$APACHE_ENVVARS"
+  if [ -f "$APACHE_ENVVARS" ]; then
+    . "$APACHE_ENVVARS"
+    chown -R "$APACHE_RUN_USER:$APACHE_RUN_GROUP" $folders
+  else
+    chown -R www-data:www-data $folders
+  fi
   chmod 775 $folders
-  chown -R "$APACHE_RUN_USER:$APACHE_RUN_GROUP" $folders
 }
 
 ##=== Check database vars ===
@@ -46,20 +50,22 @@ else
   fi
 fi
 
-#=== Enable htaccess for search engine optimisations ===
-if [ "x${DISABLE_HTACCESS}" = "x" ]; then
-    a2enmod rewrite headers
-    [ ! -f /.htaccess ] && cp _.htaccess .htaccess
-    sed -ri .htaccess \
-      -e "s~RewriteBase /phpmyfaq/~RewriteBase /~"
-    # Enabling permissions override
-    sed -ri ${APACHE_CONFDIR}/conf-available/*.conf \
-      -e "s~(.*AllowOverride).*~\1 All~g"
-else
-    rm .htaccess
-    # Disabling permissions override
-    sed -ri "${APACHE_CONFDIR}/conf-available/*.conf" \
-      -e "s~(.*AllowOverride).*~\1 none~g"
+if [ -f "$APACHE_ENVVARS" ]; then
+  #=== Enable htaccess for search engine optimisations ===
+  if [ "x${DISABLE_HTACCESS}" = "x" ]; then
+      a2enmod rewrite headers
+      [ ! -f /.htaccess ] && cp _.htaccess .htaccess
+      sed -ri .htaccess \
+        -e "s~RewriteBase /phpmyfaq/~RewriteBase /~"
+      # Enabling permissions override
+      sed -ri "${APACHE_CONFDIR}/conf-available/*.conf" \
+        -e "s~(.*AllowOverride).*~\1 All~g"
+  else
+      rm .htaccess
+      # Disabling permissions override
+      sed -ri "${APACHE_CONFDIR}/conf-available/*.conf" \
+        -e "s~(.*AllowOverride).*~\1 none~g"
+  fi
 fi
 
 #=== Configure php ===
