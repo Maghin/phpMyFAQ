@@ -15,6 +15,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: apache
     restart: always
     stdin_open: true
     links:
