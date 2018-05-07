@@ -78,6 +78,17 @@ fi
   echo "date.timezone = $PMF_TIMEZONE"
   echo "memory_limit = $PMF_MEMORY_LIMIT"
   echo "file_upload = $PMF_ENABLE_UPLOADS"
-} | tee "$PHP_INI_DIR/conf.d/php.ini"
+} | tee $PHP_INI_DIR/conf.d/php.ini
+
+#=== Set recommanded opcache settings ===
+# see https://secure.php.net/manual/en/opcache.installation.php
+{
+		echo "opcache.memory_consumption=128"
+		echo "opcache.interned_strings_buffer=8"
+		echo "opcache.max_accelerated_files=4000"
+		echo "opcache.revalidate_freq=2"
+		echo "opcache.fast_shutdown=1"
+		echo "opcache.enable_cli=1"
+} | tee $PHP_INI_DIR/conf.d/opcache-recommended.ini
 
 docker-php-entrypoint "$@"

@@ -62,33 +62,16 @@ RUN set -x \
  && apt-get purge -y ${buildDeps} \
  && rm -rf /var/lib/apt/lists/*
 
-#=== Install zip php dependencie ===
+#=== Install intl, soap opcache, and zip php dependencie ===
 RUN set -x \
- && buildDeps="zlib1g-dev" \
- && apt-get update && apt-get install -y ${buildDeps} --no-install-recommends \
- \
- && docker-php-ext-install zip \
- \
- && apt-get purge -y ${buildDeps} \
- && rm -rf /var/lib/apt/lists/*
-
-#=== Install intl php dependencie ===
-RUN set -x \
- && buildDeps="libicu-dev" \
+ && buildDeps="libicu-dev zlib1g-dev libxml2-dev"
  && apt-get update && apt-get install -y ${buildDeps} --no-install-recommends \
  \
  && docker-php-ext-configure intl \
  && docker-php-ext-install intl \
- \
- && apt-get purge -y ${buildDeps} \
- && rm -rf /var/lib/apt/lists/*
-
-#=== Install soap php dependencie ===
-RUN set -x \
- && buildDeps="libxml2-dev" \
- && apt-get update && apt-get install -y ${buildDeps} --no-install-recommends \
- \
+ && docker-php-ext-install zip \
  && docker-php-ext-install soap \
+ && docker-php-ext-install opcache \
  \
  && apt-get purge -y ${buildDeps} \
  && rm -rf /var/lib/apt/lists/*
@@ -169,7 +152,7 @@ RUN set -x \
  && apk del .build-deps \
  && rm -rf /tmp/* /usr/local/lib/php/doc/* /var/cache/apk/*
 
-#=== Install intl, soap and zip php dependencie ===
+#=== Install intl, soap opcache, and zip php dependencie ===
 RUN set -x \
  && apk add --no-cache \
   icu \
@@ -180,11 +163,9 @@ RUN set -x \
   libxml2-dev \
  && docker-php-ext-configure intl \
  && docker-php-ext-install intl \
- && docker-php-ext-enable intl \
  && docker-php-ext-install zip \
- && docker-php-ext-enable zip \
  && docker-php-ext-install soap \
- && docker-php-ext-enable soap \
+ && docker-php-ext-install opcache \
  \
  && apk del .build-deps \
  && rm -rf /tmp/* /usr/local/lib/php/doc/* /var/cache/apk/*
