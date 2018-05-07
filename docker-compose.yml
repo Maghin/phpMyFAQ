@@ -36,23 +36,11 @@ services:
     volumes:
       - ./phpmyfaq:/var/www/html
     depends_on:
-      - grunt
-  grunt:
-    image: digitallyseamless/nodejs-bower-grunt
-    restart: "no"
-    command: grunt build
-    stdin_open: true
-    tty: true
-    volumes:
-      - .:/data
-    depends_on:
       - yarn
   yarn:
     image: node:latest
     restart: "no"
-    command: sh -c "cd app && npm install node-sass -g && yarn install && yarn build"
-    environment:
-      - NODE_ENV=production
+    command: sh -c "cd app && npm install node-sass -g --unsafe-perm && yarn install && yarn build"
     stdin_open: true
     tty: true
     volumes:
