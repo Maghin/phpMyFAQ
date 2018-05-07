@@ -64,7 +64,7 @@ RUN set -x \
 
 #=== Install intl, soap opcache, and zip php dependencie ===
 RUN set -x \
- && buildDeps="libicu-dev zlib1g-dev libxml2-dev"
+ && buildDeps="libicu-dev zlib1g-dev libxml2-dev" \
  && apt-get update && apt-get install -y ${buildDeps} --no-install-recommends \
  \
  && docker-php-ext-configure intl \
