@@ -1,6 +1,6 @@
 version: "2.3"
 
-# Use this file for dev
+# Use this file for an example for production
 
 services:
   mariadb:
@@ -12,9 +12,11 @@ services:
       - MYSQL_USER=phpmyfaq
       - MYSQL_PASSWORD=phpmyfaq
     volumes:
-      - ./volumes/mariadb:/var/lib/mysql
+      - ../volumes/mariadb:/var/lib/mysql
   phpmyfaq:
-    build: .
+    build:
+      context: ..
+      dockerfile: scripts/Dockerfile-apache
     restart: always
     stdin_open: true
     environment:
@@ -34,28 +36,10 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./phpmyfaq:/var/www/html
-    depends_on:
-      - yarn
-  yarn:
-    image: node:latest
-    restart: "no"
-    command: sh -c "npm install node-sass bower grunt-cli -g --unsafe-perm && yarn install && yarn build"
-    working_dir: /app
-    stdin_open: true
-    tty: true
-    volumes:
-      - .:/app
-    depends_on:
-      - composer
-  composer:
-    image: composer:latest
-    restart: "no"
-    command: composer install --verbose --no-dev
-    stdin_open: true
-    tty: true
-    volumes:
-      - .:/app
+      - ../volumes/phpmyfaq/attachments:/var/www/html/attachments
+      - ../volumes/phpmyfaq/data:/var/www/html/data
+      - ../volumes/phpmyfaq/images:/var/www/html/images
+      - ../phpmyfaq/config:/var/www/html/config
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     restart: always
@@ -65,7 +49,7 @@ services:
     ports:
       - "8000:80"
     volumes:
-      - ./volumes/sessions:/sessions
+      - ../volumes/sessions:/sessions
   elasticsearch:
     image: elasticsearch:2.4.6
     restart: always
@@ -78,4 +62,4 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - ./volumes/esdata:/usr/share/elasticsearch/data
+      - ../volumes/esdata:/usr/share/elasticsearch/data
